@@ -1984,11 +1984,12 @@ jobs:
           sudo apt-get install -y libarchive-tools libfuse2
           # set-up appimage-builder
           # https://github.com/AppImage/AppImageKit/issues/1395
-          sudo python3 -m pip install --upgrade setuptools wheel
-          sudo python3 -m pip install --use-pep517 git+https://github.com/rustdesk-org/appimage-builder.git
+          rm -rf /tmp/appimage-builder
+          git clone --depth 1 https://github.com/rustdesk-org/appimage-builder.git /tmp/appimage-builder
+          sudo python3 -m pip install -r /tmp/appimage-builder/requirements.txt
           # run appimage-builder
           pushd appimage
-          sudo appimage-builder --skip-tests --recipe ./AppImageBuilder-${{ matrix.job.arch }}.yml
+          sudo env PYTHONPATH=/tmp/appimage-builder python3 /tmp/appimage-builder/appimagebuilder/__main__.py --skip-tests --recipe ./AppImageBuilder-${{ matrix.job.arch }}.yml
 
       - name: Publish appimage package
         if: env.UPLOAD_ARTIFACT == 'true'
